@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"log"
 )
@@ -24,4 +25,21 @@ func AddAction(action Action) {
 	}
 
 	log.Printf("Inserted action with _id: %v\n", result.InsertedID)
+}
+
+func FindActions(userID primitive.ObjectID) (result []Action) {
+	coll := getCollection(Action{})
+	filter := bson.D{{"user_id", userID}}
+
+	cursor, err := coll.Find(context.TODO(), filter)
+	if err != nil {
+		return nil
+	}
+
+	err = cursor.All(context.TODO(), &result)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return
 }
