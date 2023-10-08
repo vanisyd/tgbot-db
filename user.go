@@ -16,7 +16,7 @@ func (u User) collectionName() string {
 	return UsersCollection
 }
 
-func AddUser(user User) {
+func AddUser(user User) interface{} {
 	coll := getCollection(user)
 	result, err := coll.InsertOne(context.TODO(), user)
 	if err != nil {
@@ -24,6 +24,12 @@ func AddUser(user User) {
 	}
 
 	log.Printf("Inserted user with _id: %v\n", result.InsertedID)
+
+	if uid, ok := result.InsertedID.(primitive.ObjectID); ok {
+		return uid
+	}
+
+	return nil
 }
 
 func FindUser(userID int) (result User) {
@@ -32,7 +38,19 @@ func FindUser(userID int) (result User) {
 
 	err := coll.FindOne(context.TODO(), filter).Decode(&result)
 	if err != nil {
-		log.Fatal(err)
+		return User{}
+	}
+
+	return
+}
+
+func GetUser(userObjID primitive.ObjectID) (result User) {
+	coll := getCollection(User{})
+	filter := bson.D{{"_id", userObjID}}
+
+	err := coll.FindOne(context.TODO(), filter).Decode(&result)
+	if err != nil {
+		return User{}
 	}
 
 	return

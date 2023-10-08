@@ -33,7 +33,7 @@ func FindActions(userID primitive.ObjectID) (result []Action) {
 
 	cursor, err := coll.Find(context.TODO(), filter)
 	if err != nil {
-		return nil
+		return []Action{}
 	}
 
 	err = cursor.All(context.TODO(), &result)
