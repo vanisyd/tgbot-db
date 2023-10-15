@@ -32,16 +32,17 @@ func AddUser(user User) interface{} {
 	return nil
 }
 
-func FindUser(userID int) (result User) {
-	coll := getCollection(User{})
+func FindUser(userID int) interface{} {
+	var result User
+	coll := getCollection(result)
 	filter := bson.D{{"tg_id", userID}}
 
 	err := coll.FindOne(context.TODO(), filter).Decode(&result)
 	if err != nil {
-		return User{}
+		return nil
 	}
 
-	return
+	return result
 }
 
 func GetUser(userObjID primitive.ObjectID) (result User) {
