@@ -45,3 +45,33 @@ func FindBot(hashID string) interface{} {
 
 	return result
 }
+
+func GetBots() interface{} {
+	var result []Bot
+	coll := getCollection(Bot{})
+
+	cursor, err := coll.Find(context.TODO(), bson.D{})
+	if err != nil {
+		return nil
+	}
+
+	for cursor.Next(context.TODO()) {
+		var botData Bot
+		err := cursor.Decode(&botData)
+		if err != nil {
+			log.Println("[DB.Error]" + err.Error())
+			continue
+		}
+		result = append(result, botData)
+	}
+
+	if err := cursor.Err(); err != nil {
+		log.Println("[DB.Error]" + err.Error())
+	}
+
+	err = cursor.Close(context.TODO())
+	if err != nil {
+		log.Println("[DB.Error]" + err.Error())
+	}
+	return result
+}
